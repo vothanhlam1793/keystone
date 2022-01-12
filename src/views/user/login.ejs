@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div>
+                <input class="form-control" type="text" v-model="user" placeholder="Tên đăng nhập">
+                <input class="form-control" type="password" v-model="pass" placeholder="Mật khẩu">
+                <button @click="signin()">Đăng nhập</button>
+            </div>
+            <button @click="query()">Query Test</button>
+            <button @click="auth()">Get Auth</button>
+            <button @click="logout()">Log out</button>
+        </div>
+        <script>
+            var TOKEN = "Bearer ";
+            const SIGNIN = `
+            mutation signin($identity: String, $secret: String) {
+                authenticate: authenticateUserWithPassword(username: $identity, password: $secret) {
+                    token
+                    item {
+                        id
+                    }
+                }
+            }
+            `
+            const LOGOUT = `
+            mutation {
+                unauthenticate: unauthenticateUser {
+                    success
+                }
+            }
+            `
+            const GET_AUTH = `
+            {
+                authenticatedUser{
+                    username
+                }
+            }
+            `
+            function graphql(query, variables = {}) {
+                return fetch('http://localhost:3000/admin/api', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    // 'Authorization': TOKEN,
+                    },
+                    body: JSON.stringify({
+                    variables,
+                    query,
+                    }),
+                }).then(function(result) {
+                    return result.json();
+                });
+            }
+            var app = new Vue({
+                el: "#app",
+                data: {
+                    user: "",
+                    pass: ""
+                },
+                methods: {
+                    query: function(){
+                        graphql(`{
+                            allUsers {
+                                username
+                                id
+                            }
+                        }`).then(console.log);
+                    },
+                    signin: function(){
+                        graphql(SIGNIN, {
+                            identity: this.user,
+                            secret: this.pass
+                        }).then(a => {
+                            if(a.data.authenticate == null){
+                                console.log(a.errors[0].message);
+                            } else {
+                                console.log("Đã đăng nhập");
+                                TOKEN = "Bearer " + a.data.authenticate.token; 
+                            }
+                        })
+                    },
+                    auth: function(){
+                        graphql(GET_AUTH).then(data => {
+                            if(data.data.authenticatedUser != null){
+                                console.log("Đã đăng nhập");
+                            } else {
+                                console.log("Chưa đăng nhập")
+                            }
+                        });   
+                    },
+                    logout: function(){
+                        graphql(LOGOUT).then(data=>{
+                            if(data.data.unauthenticate.success){
+                                console.log("Đã đăng xuất");
+                            }
+                        })
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

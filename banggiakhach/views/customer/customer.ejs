@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <%- include("header.ejs", {title: title}) %>
+</head>
+    <body class="container">
+        <div class="alert alert-primary">   
+          <%- include("menu.ejs",{}) %>
+      </div>
+        <h1>Tra cứu nhanh</h1>
+        <div>
+            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Nhập vào đây để tra cứu nhé" title="Type in a name">
+            <table class="table table-bordered" id="myTable">
+                <tr>
+                    <td>Mã</td>
+                    <td>Giá đại lý</td>
+                    <td>Chiết khấu</td>
+                    <td>Loại</td>
+                    <td>Hãng</td>
+                </tr>
+                <% function numberWithCommas(x) { %>
+                 <% return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); %>
+                <% } %>
+                <% data.forEach(function(e){ %>
+                <tr>
+                    <td><%= e.productNameColumn %></td>
+                    <td style="text-align:right" class="table-secondary"><%= numberWithCommas(e.productPriceColumn) %></td>
+                    <td style="text-align:right" class="table-danger"><%= numberWithCommas(e.cap3) %></td>
+                    <td><%= e.sheet %></td>
+                    <td><%= e.branch %></td>
+                </tr>
+                <% }) %>
+            </table>
+        </div>
+        <script>
+            function myFunction() {
+              var input, filter, table, tr, td, i, txtValue;
+              input = document.getElementById("myInput");
+              filter = input.value.toUpperCase();
+              table = document.getElementById("myTable");
+              tr = table.getElementsByTagName("tr");
+              for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                  txtValue = td.textContent || td.innerText;
+                  if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                  } else {
+                    tr[i].style.display = "none";
+                  }
+                }       
+              }
+            }
+            </script>
+    </body>
+</html>

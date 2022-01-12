@@ -1,0 +1,55 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <h2>Hello</h2>
+        <script>
+            /** 
+  GraphQL Queries & Mutations
+*/
+const GET_TODOS = `
+  query GetTodos {
+    allTodos {
+      name
+      id
+    }
+  }
+`;
+
+const ADD_TODO = `
+    mutation AddTodo($name: String!) {
+      createTodo(data: { name: $name }) {
+        name
+        id
+      }
+    }
+  `;
+
+const REMOVE_TODO = `
+    mutation RemoveTodo($id: ID!) {
+      deleteTodo(id: $id) {
+        name
+        id
+      }
+    }
+  `;
+
+function graphql(query, variables = {}) {
+    return fetch('http://localhost:3000/api/graphql', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'Cookie': 'keystonejs-session=Fe26.2**66229c26cd53addbce5669839ce0fc5159fe97777065e24ded5ee670c527dc1d*jEAYXmW4M-cVTI2URG6syw*_wfLiNG2QuZ6detNMdOtHpB3Cjsds8Tie0iSLGXbqQRBYLkTWhyGudTinTKROKiWp-6JdkY60li69gSmx5Ew_xTrz8WbCuhHC6HPJQhlfqE*1644535187372*d05609efff821bc4f239b0625278682b9e690ff18c7e4262dcd59756ad54ccda*s30l7hfhFnjEESwkB5_03dKphJ2jGf7aikxietyZaoM'
+        },
+        body: JSON.stringify({
+        variables,
+        query,
+        }),
+    }).then(function(result) {
+        return result.json();
+    });
+}
+
+        </script>
+    </body>
+</html>

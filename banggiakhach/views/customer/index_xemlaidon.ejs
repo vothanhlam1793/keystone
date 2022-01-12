@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <%- include("header.ejs", {title: title}) %>
+        <script src="/js/customer/model.js"></script>
+        <script src="/js/customer/cart.js"></script>
+     </head>
+    <body class="container-fluid">
+        <div>   
+            <%- include("menu.ejs",{}) %>
+        </div>
+        <div class="text-center mt-2">
+            <h4>Tra cứu đơn hàng đã đặt</h4>
+        </div>
+        <%- include("modal.ejs") %>
+        <%- include("xemlaidon.ejs") %>
+        <%- include("footer.ejs") %>
+        <!-- </div> -->
+    </body>
+</html>
