@@ -85,11 +85,17 @@ class CretaApp {
   }
 }
 
+class UserApp {
+  prepareMiddleware({ keystone, dev, distDir }) { 
+    return require("./app_user/main").middle;
+  }
+}
 module.exports = {
   keystone,
   apps: [
     new GraphQLApp(), 
     new AdminUIApp({ name: PROJECT_NAME, enableDefaultRoute: false , authStrategy}),
     new CretaApp(),
+    // new UserApp(),
   ],
 };
