@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express"); 
 var logger = require('morgan')
 const app = express();
 const fileUpload = require('express-fileupload');
@@ -20,31 +20,31 @@ db.mongoose
         console.log("Cannot connect to the database!", err);
         process.exit();
 });
+function middle(keystone, dev, distDir){
+  app.use(fileUpload());
+  app.use(logger('dev'));
+  app.set('views', __dirname + "/views");
+  app.set('view engine', 'ejs')
+  app.use(express.static(path.join(__dirname,'public')))
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-app.use(fileUpload());
-app.use(logger('dev'));
-app.set('views', __dirname + "/views");
-app.set('view engine', 'ejs')
-app.use(express.static(path.join(__dirname,'public')))
+  require("./route/tool.route")(app);
+  require("./route/customer")(app);
+  app.use("/baogia", require("./route/baogia"));
+  app.use("/product", require("./route/product"));
+  require("./app/routes/product.route")(app);
+  require("./app/routes/cart.route")(app);
+  app.use("/user", require("./route/user").router(keystone));
 
-app.use(express.json());
-
-app.use(express.urlencoded({ extended: true }));
-
-require("./route/tool.route")(app);
-require("./route/customer")(app);
-app.use("/baogia", require("./route/baogia"));
-app.use("/product", require("./route/product"));
-require("./app/routes/product.route")(app);
-require("./app/routes/cart.route")(app);
-
-app.get('*', function(req, res){
-  res.render("customer/index", {
-    title: "Bảng giá phụ kiện"
-  })
-});
+  app.get('*', function(req, res){
+    res.render("customer/index", {
+      title: "Bảng giá phụ kiện"
+    })
+  });
+  return app;
+}
 
 
 
-
-module.exports.middle = app;
+module.exports.middle = middle;

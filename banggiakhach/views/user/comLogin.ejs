@@ -1,0 +1,92 @@
+<div id="login">
+    <div v-if="!auth">
+        <div class="mt-3 form-group">
+            <label>Tên đăng nhập</label>
+            <input class="form-control" v-model="username">
+        </div>
+        <div class="mt-3 form-group">
+            <label>Mật khẩu</label>
+            <input class="form-control" v-model="password" type="password">
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-success" @click="login()">Đăng nhập</button>
+        </div>
+        <div class="mt-3">
+            <a>Quên mật khẩu</a>
+        </div>
+    </div>
+    <div v-else>
+        <div>
+            Chào: {{user.username}}
+            <button class="btn btn-secondary" @click="logout()">Đăng xuất</button>
+        </div>
+    </div>
+</div>
+<script>
+    var SIGNIN = `
+    mutation signin($identity: String, $secret: String) {
+        authenticate: authenticateUserWithPassword(username: $identity, password: $secret) {
+            item {
+            id
+            }
+        }
+    }
+    `
+    var SIGNOUT = `
+        mutation {
+            unauthenticate: unauthenticateUser {
+                success
+            }
+        }
+
+    `
+    var appLogin = new Vue({
+        el: "#login",
+        data: {
+            username: "",
+            password: "",
+            auth: false,
+            user: {}
+        },
+        methods: {
+            logout: function(){
+                var that = this;
+                graphql(SIGNOUT).then(a=>{
+                    console.log(a);
+                    if(a.data.unauthenticate.success){
+                        that.auth = false;
+                    }
+                })
+            },
+            login: function(){
+                var that = this;
+                graphql(SIGNIN, {
+                    identity: this.username,
+                    secret: this.password
+                }).then(a => {
+                    if(a.data.authenticate.item){
+                        that.auth = true;
+                        that.checkUser();
+                    }
+                });
+            },
+            checkUser: function(){
+                var that = this;
+                fetch("/user/info").then(res=>res.json()).then(data=>{
+                    if(!data.message) {
+                        console.log("Đăng nhập thành công");
+                        console.log("DATA", data);
+                        that.user = data.data.User;
+                        that.auth = true;
+                    } else {
+                        that.auth = false;
+                        console.log("Chưa đăng nhập");
+                    }
+                })
+            }
+        },
+        created: function(){
+            this.checkUser();
+        }
+    })
+</script>

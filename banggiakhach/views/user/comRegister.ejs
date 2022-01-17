@@ -1,0 +1,109 @@
+<div id="app" class="">
+    <div class="">
+        <label>Nhập số điện thoại</label>
+        <input class="form-control" v-model="obj.username" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
+    </div>
+    <div class="mt-2">
+        <button class="btn btn-warning" @click="checkUser()">Tiếp tục</button>
+    </div>
+</div>
+<script>
+    var CREATE_USER = `
+    mutation createUser($username: String, $password: String){
+        createUser(data: { 
+            phone: $username
+            username: $username,
+            password: $password
+        }) {
+            id phone
+        }
+    }
+    `
+    var CHECK_USER = `
+    query checkUser($phone: String!){
+        queryPhoneRister(phone: $phone){
+            activate
+            username
+            id
+            phone
+        }
+    }
+    `
+
+    var RECOVERY = `
+    mutation findUserByEmail($username: String!) {
+        startPasswordRecovery( username: $username ) {
+            accessedAt
+        }
+    }
+    `
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    var app = new Vue({
+        el: "#app",
+        data: {
+            obj: {}
+        },
+        methods: {
+            recovery: function(user){
+                let s_user = user || this.obj.username;
+                graphql(RECOVERY, {
+                    username: s_user
+                }).then(a=>{
+                    console.log(a);
+                    alert("Gởi tin xác thực đến số điện thoại");
+                    location.href="/user/otp"
+                })
+            },
+            checkUser: function(){
+                var that = this;
+                if(this.obj.username.length != 10){
+                    return alert("Nhập số điện thoại 10 số");
+                }
+                graphql(CHECK_USER, {
+                    phone: this.obj.username
+                }).then((a)=>{
+                    console.log(a);
+                    if(!a.data.queryPhoneRister){
+                        // Chua dang ky
+                        console.log("chưa đang ký")
+                        that.register();
+                    } else if (!a.data.queryPhoneRister.activate){
+                        // Da dang ky
+                        console.log("Chưa xác thực");
+                        that.recovery();
+                    } else {
+                        if(params.forgotPassword==1){
+                            that.recovery(a.data.queryPhoneRister.username);
+                        } else {
+                            alert("Số điện thoại đã đăng ký!. Vào trang đăng nhập!.");
+                            location.href = "/user/login";
+                        }
+                    }
+                })
+            },
+            register: function(){
+                if(!this.obj.username){
+                    alert("Nhập tên đăng nhập");
+                    return;
+                }
+                graphql(CREATE_USER, {
+                    username: this.obj.username,
+                    phone: this.obj.username,
+                    password: Math.round(Math.random()*10000000000).toString()
+                }).then(a => {
+                    if(a.data.createUser.id){
+                        // Đăng ký thành công
+                        alert("Gởi tin xác thực đến số điện thoại");
+                        location.href="/user/otp"
+                    } else {
+                        // Đăng ký thất bại
+                    }
+                });
+            }
+        },
+        created: function(){
+
+        }
+    })    
+</script>

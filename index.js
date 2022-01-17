@@ -4,71 +4,46 @@ const { Text, Password, Checkbox } = require('@keystonejs/fields');
 const { PasswordAuthStrategy } = require('@keystonejs/auth-password');
 const { AdminUIApp } = require('@keystonejs/app-admin-ui');
 const { MongooseAdapter: Adapter } = require('@keystonejs/adapter-mongoose');
-const MongoStore = require('connect-mongo');
-const { MongoClient } = require('mongodb');
-const PROJECT_NAME = 'ks5';
+
+// File enviroment
+const dotenv = require('dotenv')
+dotenv.config()
+
+// Setup
+const { isSignedIn, permission } = require('./access');
+const { Session, Cookie } = require("./session");
+
+// List
+const User = require("./lists/User");
+const Product = require("./lists/Product");
+const ProductImage = require("./lists/ProductImage");
+const Role = require("./lists/Role");
+const { customSchema, ForgottenPasswordToken } = require('./lists/ForgottenPasswordToken');
+
+const PROJECT_NAME = process.env.PROJECT_NAME;
 const adapterConfig = { 
-  mongoUri: 'mongodb://node.creta.work:30042/ks5-data',
-  "user": "black",
-  "pass": "asrkpvg7",
-  authSource: "admin",
+  mongoUri: process.env.MONGO_URL,
+  "user": process.env.MONGO_USER,
+  "pass": process.env.MONGO_PASS,
+  authSource: process.env.MONGO_AUTH_SOURCE,
   useNewUrlParser: true,
   useUnifiedTopology: true
 };
-// const { CretaApp } = require("./src/index");
 
-/**
- * You've got a new KeystoneJS Project! Things you might want to do next:
- * - Add adapter config options (See: https://keystonejs.com/keystonejs/adapter-mongoose/)
- * - Select configure access control and authentication (See: https://keystonejs.com/api/access-control)
- */
-var db = new MongoClient("mongodb://node.creta.work:30042/ks5",{
-  auth: {
-    "user": "black",
-    "password": "asrkpvg7"
-  },
-  authSource: "admin",
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
 const keystone = new Keystone({
   adapter: new Adapter(adapterConfig),
-  sessionStore: MongoStore.create({ 
-    clientPromise: db.connect()
-  }),
-  cookie: {
-    // secure: true,
-    // secure: process.env.NODE_ENV === 'production', // Default to true in production
-    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-    sameSite: false,
-  },
+  sessionStore: Session.sessionStore,
+  cookie: Cookie.cookie,
   cookieSecret: "THU NGHIEM MOT CAI GI DO NO DAI THIET DAI LA DUOC MA PHAI KHONG",
 });
 
-keystone.createList('User', {
-  access: {
-    // 1. Only admins can read deactivated user accounts
-    read: ({ authentication: { item } }) => {
-      if (item.isAdmin) {
-        return {}; // Don't filter any items for admins
-      }
-      // Approximately; users.filter(user => user.state !== 'deactivated');
-      return {
-        state_not: 'deactivated',
-      };
-    },
-  },
-  fields: {
-    username: {
-      type: Text
-    },
-    password: {
-      type: Password
-    },
-    isAdmin: { type: Checkbox, defaultValue: false },
+keystone.createList('User', User);
+keystone.createList('Product', Product);
+keystone.createList('ProductImage', ProductImage);
+keystone.createList('Role', Role);
+keystone.createList('ForgottenPasswordToken', ForgottenPasswordToken);
 
-  }
-})
+keystone.extendGraphQLSchema(customSchema);
 
 const authStrategy = keystone.createAuthStrategy({
   type: PasswordAuthStrategy,
@@ -80,22 +55,21 @@ const authStrategy = keystone.createAuthStrategy({
 });
 
 class CretaApp {
-  prepareMiddleware({ keystone, dev, distDir }) { 
-    return require("./banggiakhach/main").middle;
+  prepareMiddleware({ keystone, dev, distDir }) {
+    return require("./banggiakhach/main").middle(keystone, dev, distDir);
   }
 }
 
-class UserApp {
-  prepareMiddleware({ keystone, dev, distDir }) { 
-    return require("./app_user/main").middle;
-  }
-}
 module.exports = {
   keystone,
   apps: [
     new GraphQLApp(), 
-    new AdminUIApp({ name: PROJECT_NAME, enableDefaultRoute: false , authStrategy}),
+    new AdminUIApp({ 
+      name: PROJECT_NAME, 
+      enableDefaultRoute: false , 
+      authStrategy,
+      isAccessAllowed: ({ authentication: { item: user, listKey: list } }) => !!user && !!user.isAdmin,
+    }),
     new CretaApp(),
-    // new UserApp(),
   ],
 };
