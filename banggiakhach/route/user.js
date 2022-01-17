@@ -41,7 +41,6 @@ module.exports.router = (keystone) => {
           var a = await getInfo(keystone, req.session.keystoneListKey, req.session.keystoneItemId);
           return res.send(a);
         } else {
-            console.log("KEYSTONE", keystone);
             return res.send({
             message: "Authentication error"
           })

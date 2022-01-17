@@ -19,7 +19,7 @@ module.exports = {
         email: {
             type: Text,
             // isRequired: true,
-            isUnique: true
+            // isUnique: true
         },
         // cart: {},
         // orders: {},
@@ -38,6 +38,7 @@ module.exports = {
         },
         username: {
             type: Text,
+            isRequired: true,
             isUnique: true
         },
         password: {
