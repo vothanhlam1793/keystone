@@ -21,13 +21,20 @@
                 <script src="/js/support.js"></script>
                 <link rel="stylesheet" href="/css/phone.css">
                 <link rel="stylesheet" href="/css/messenger.css">
-
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-1EXJ7NB11Z"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-1EXJ7NB11Z');
-</script> -->
+                <script src="/js/component/notify.js"></script>
+                <script src="/js/component/register.js"></script>
+                <script src="/js/component/login.js"></script>
+                <script src="/js/component/otp.js"></script>
+                <script src="/js/graphql.js"></script>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+                <% if( process.env.NODE_ENV === 'production' ) { %>
+                        <!-- Global site tag (gtag.js) - Google Analytics -->
+                        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1EXJ7NB11Z"></script>
+                        <script>
+                          window.dataLayer = window.dataLayer || [];
+                          function gtag(){dataLayer.push(arguments);}
+                          gtag('js', new Date());
+                        
+                          gtag('config', 'G-1EXJ7NB11Z');
+                        </script>
+                        <% } %>

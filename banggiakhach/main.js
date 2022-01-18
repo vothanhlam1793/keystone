@@ -20,6 +20,7 @@ db.mongoose
         console.log("Cannot connect to the database!", err);
         process.exit();
 });
+
 function middle(keystone, dev, distDir){
   app.use(fileUpload());
   app.use(logger('dev'));
@@ -44,7 +45,5 @@ function middle(keystone, dev, distDir){
   });
   return app;
 }
-
-
 
 module.exports.middle = middle;

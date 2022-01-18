@@ -18,23 +18,35 @@ Vue.component("otp", {
         otp: function(){
             console.log(this.code);
             if(this.code.length != 6){
-                return alert("OTP có 6 chữ số");
+                this.$emit('notify', {
+                    content: "OTP có 6 ký tự",
+                    type: "DANGER"
+                })
             }
             this.step = 2;
         },
         changePass: function(){
             if(this.password.length < 8){
-                return alert("Mật khẩu phải có ít nhất 8 kí tự");
+                return this.$emit('notify', {
+                    content: "Mật khẩu ít nhất có 8 kí tự nhé",
+                    type: "WARNING"
+                })
             }
             graphql(CHANGE_PASSWORD, {
                 token: this.code,
                 password: this.password
             }).then(a => {
                 if(!a.data.changePasswordWithToken){
-                    console.log("Reset thất bại");
+                    this.$emit('notify', {
+                        content: "Có vẻ bạn đã nhập sai OTP, hoặc hệ thống bị lỗi - Thử lại nhé",
+                        type: "FAILURE"
+                    });
+                    this.step = 1;
                 } else {
-                    location.href="/user/login";
-                    console.log("Reset thành công");
+                    this.$emit('notify', {
+                        content: "Thay đổi mật khẩu thành công - đăng nhập nhé!",
+                        type: "SUCCESS"
+                    })
                 }
             })
         },

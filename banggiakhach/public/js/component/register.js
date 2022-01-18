@@ -40,15 +40,20 @@ Vue.component('register', {
             graphql(RECOVERY, {
                 username: s_user
             }).then(a=>{
-                console.log(a);
-                alert("Gởi tin xác thực đến số điện thoại");
+                this.$emit("notify", {
+                    content: "Tin nhắn OTP đang gởi đến - bạn đợi khoảng 30 giây nhé!",
+                    type: "INFO"
+                })
                 this.$emit('changemode', "OTP");
             })
         },
         checkUser: function(){
             var that = this;
             if(this.obj.username.length != 10){
-                return alert("Nhập số điện thoại 10 số");
+                return this.$emit("notify", {
+                    content: "Nhập số điện thoại 10 số",
+                    type: "ERROR"
+                })
             }
             graphql(CHECK_USER, {
                 phone: this.obj.username
@@ -67,7 +72,11 @@ Vue.component('register', {
                     if(this.$props.forgot == 1){
                         that.recovery(a.data.queryPhoneRister.username);
                     } else {
-                        alert("Số điện thoại đã đăng ký!. Vào trang đăng nhập!.");
+                        this.$emit("notify", {
+                            content: "Số điện thoại đã đăng ký!. Vào trang đăng nhập!.",
+                            type: "WARNING"
+                        })
+                        // alert("Số điện thoại đã đăng ký!. Vào trang đăng nhập!.");
                         this.$emit('changemode', "LOGIN");
                     }
                 }
@@ -75,7 +84,10 @@ Vue.component('register', {
         },
         register: function(){
             if(!this.obj.username){
-                alert("Nhập tên đăng nhập");
+                this.$emit("notify", {
+                    content: "Đừng để trống đăng nhập chứ!",
+                    type: "WARNING"
+                })
                 return;
             }
             graphql(CREATE_USER, {
@@ -86,7 +98,10 @@ Vue.component('register', {
                 console.log(a);
                 if(a.data.createUser.id){
                     // Đăng ký thành công
-                    alert("Gởi tin xác thực đến số điện thoại");
+                    this.$emit("notify", {
+                        content: "Tin nhắn OTP đang gởi đến - bạn đợi khoảng 30 giây nhé!",
+                        type: "INFO"
+                    })
                     this.$emit('changemode', "OTP");
                 } else {
                     // Đăng ký thất bại

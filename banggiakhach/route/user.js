@@ -36,7 +36,7 @@ module.exports.router = (keystone) => {
     })
     
     router.get("/info", async function(req, res){
-        
+        console.log(req.session);
         if(req.session.keystoneListKey){
           var a = await getInfo(keystone, req.session.keystoneListKey, req.session.keystoneItemId);
           return res.send(a);

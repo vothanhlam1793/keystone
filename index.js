@@ -32,6 +32,7 @@ const adapterConfig = {
 
 const keystone = new Keystone({
   adapter: new Adapter(adapterConfig),
+  // secureCookies: false,
   sessionStore: Session.sessionStore,
   cookie: Cookie.cookie,
   cookieSecret: "THU NGHIEM MOT CAI GI DO NO DAI THIET DAI LA DUOC MA PHAI KHONG",

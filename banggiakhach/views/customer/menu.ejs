@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+<nav class="navbar navbar-expand-md bg-dark navbar-dark" id="nav_collapsibleNavbar">
     <a class="navbar-brand" href="/">Creta Solu</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
@@ -24,5 +24,110 @@
                 <a class="nav-link" href="/info">Liên hệ</a>
             </li>    
         </ul>
-    </div>  
+        <login-menu @notify='notify_login'></login-menu>
+    </div>
+    <!-- Modal -->
+    <div>
+        <div class="modal" id="modal_menu">
+            <div class="modal-dialog">
+              <div class="modal-content">
+          
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Thông báo</h4>
+                    <button type="button" class="close" data-dismiss="modal" @click="jQuery('#modal_menu').hide()">&times;</button>
+                </div>
+          
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <notify :content="notify.content" :type="notify.type"></notify>
+                    <div v-if="mode=='LOGIN'">
+                        <login @notify='notify_login'></login>
+                        <div class="mt-4 text-center">
+                            <a @click="mode='REGISTER'" href="#">Đăng ký</a> | 
+                            <a @click="mode='REGISTER'; forgot=1;" href="#">Quên mật khẩu</a>
+                        </div>
+                    </div>
+                    <div v-if="mode=='REGISTER'">
+                        <register @changemode="changemode" @notify="(noti)=>{notify=noti}" :forgot="forgot"></register>
+                    </div>
+                    <div v-if="mode=='OTP'">
+                        <div v-if='counter_ui'>
+                            <p>Chờ: {{counter}} s</p>
+                        </div>
+                        <otp @notify="notify_otp"></otp>
+                    </div>
+                </div>
+          
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal" @click="jQuery('#modal_menu').hide()"><i class="material-icons">close</i></button>
+                </div>
+          
+              </div>
+            </div>
+          </div>
+    </div>
 </nav>
+<script>
+    var app_collapsibleNavbar = new Vue({
+        el: "#nav_collapsibleNavbar",
+        data: {
+            notify: {},
+            jQuery: jQuery,
+            mode: "LOGIN",
+            forgot: 0,
+            counter: 0,
+            counter_ui: false,
+            cs: 0,
+        },
+        methods: {
+            changemode: function(a, phone){
+                var that = this;
+                this.mode=a;
+                if(a=="OTP"){
+                    this.counter_ui = true;
+                    this.counter = 0;
+                    this.cs = setInterval(()=>{
+                        that.counter += 1;
+                    }, 1000);
+                } else {
+                    this.counter_ui = false;
+                    clearInterval(this.cs);
+                }
+                if(!phone){
+                    this.phone = phone;
+                }
+            },
+            statuslogin: function(a){
+                console.log(a);
+            },
+            notify_login: function(noti){
+                this.notify=noti; 
+                if(noti.type=="ERROR") {
+                    jQuery("#modal_menu").show()
+                }
+                if(noti.type=='REGISTER'){
+                    jQuery("#modal_menu").show();
+                    this.mode = "REGISTER";
+                }
+                if(noti.type=="SUCCESS"){
+                    location.reload();
+                }
+            },
+            notify_otp: function(noti){
+                if(noti.type == "SUCCESS"){
+                    this.notify = noti;
+                    this.mode = "LOGIN";
+                    return;
+                }
+                if(noti.type == "FAILURE"){
+                    this.notify.content = noti.content;
+                    this.notify.type = "ERROR";
+                    return;
+                }
+                this.notify = noti;
+            }
+        }
+    })
+</script>
