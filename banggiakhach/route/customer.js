@@ -82,10 +82,20 @@ module.exports = async app => {
 
     router.get("/banggia", (req, res)=>{
         console.log(req.query);
-        res.render("customer/index", {
-            title: "Bảng giá phụ kiện"
-        })
+        // if(req.session.keystoneListKey){
+            res.render("customer/index", {
+                title: "Bảng giá phụ kiện"
+            })
+        // } else {
+        //     res.redirect("/thongbao");
+        // }
     })
+
+    router.get("/thongbao", (req, res) => {
+        res.render("customer/thongbao", {
+            title: "Thông báo"
+        });
+    });
 
     router.get("/modal", (req, res)=>{
         fs.readFile(__dirname + "/data/modal.json", (err, m) => {

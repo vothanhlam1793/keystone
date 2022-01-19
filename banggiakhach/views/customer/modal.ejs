@@ -1,12 +1,13 @@
 <div id="modal-modal">
     <!-- <button id="btnOpenModal" @click="toggle()">Open Modal</button> -->
     <div class="modal" id="myModal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="text-center border border-dark">
                     <div class="p-2 bg bg-dark">
                         <button type="button" class="btn btn-danger mb-2" @click="toggle()">Đóng</button>
-                        <img :src="'/images/modal/' + model.modal.img" class="img-fluid" alt="Quảng cáo">
+                        <!-- <img :src="'/images/modal/' + model.modal.img" class="img-fluid" alt="Quảng cáo"> -->
+                        <%- include("form-thongbao.ejs"); %>
                     </div>
                 </div>
         
@@ -40,9 +41,11 @@
                 this.openModal();
             },
             openModal: function(){
-                if(this.model.modal.state == "ON"){
+                // if(this.model.modal.state == "ON"){
+                if(localStorage.SIGNED != 'true'){
                     jQuery("#myModal").show();
                 }
+                // }
             }
         },
         mounted: function(){

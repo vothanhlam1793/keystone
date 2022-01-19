@@ -39,9 +39,10 @@ function middle(keystone, dev, distDir){
   app.use("/user", require("./route/user").router(keystone));
 
   app.get('*', function(req, res){
-    res.render("customer/index", {
-      title: "Bảng giá phụ kiện"
-    })
+    res.redirect("/");
+    // res.render("customer/index", {
+    //   title: "Bảng giá phụ kiện"
+    // })
   });
   return app;
 }

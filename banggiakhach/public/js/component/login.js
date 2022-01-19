@@ -63,6 +63,7 @@ var mixin_login = {
                     that.checkUser();
                     that.$emit('changestatus', 'SIGNED');
                     that.setNotify("Đăng nhập thành công", "SUCCESS");
+                    localStorage.setItem("SIGNED", true);
                 }
             });
         },
@@ -73,8 +74,10 @@ var mixin_login = {
                 if(!data.message) {
                     that.user = data.data.User;
                     that.auth = true;
+                    localStorage.setItem("SIGNED", true);
                 } else {
                     that.auth = false;
+                    localStorage.setItem("SIGNED", false);
                 }
             })
         }
