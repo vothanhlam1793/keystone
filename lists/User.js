@@ -10,7 +10,8 @@ const {
   DateTime,
 } = require('@keystonejs/fields');
 const { isSignedIn, permission } = require('../access');
-
+var { getKiotViet } = require("../banggiakhach/route/adapter/kiot");
+var { hubot } = require("../banggiakhach/route/adapter/hubot");
 module.exports = {
     fields: {
         name: {
@@ -20,6 +21,9 @@ module.exports = {
             type: Text,
             // isRequired: true,
             // isUnique: true
+        },
+        code: {
+            type: Text
         },
         // cart: {},
         // orders: {},
@@ -81,6 +85,7 @@ module.exports = {
     hooks: {
         resolveInput: async ({operation, resolvedData, context }) => {
             if(operation == "create"){
+                b = await getKiotViet("https://public.kiotapi.com/customers?contactNumber=" + resolvedData.phone);
                 var a = await context.executeGraphQL({
                     query: `
                         query getCustomer($slug: String!){
@@ -96,6 +101,16 @@ module.exports = {
                     }
                 });
                 resolvedData.role = a.data.allRoles[0].id;
+                let nameCus = "Không có tên";
+                if(b.total > 0){
+                    resolvedData.name = b.data[0].name;
+                    nameCus = b.data[0].name;
+                    resolvedData.code = b.data[0].code;
+                }
+                var mess = [];
+                mess.push("Có số điện thoại mới đăng ký: *" + resolvedData.phone + "*");
+                mess.push("Kiot tên là: *" + nameCus + "*");
+                hubot(mess.join("\n"), "kinh_doanh");
             }
             return resolvedData;
         },

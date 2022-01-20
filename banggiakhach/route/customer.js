@@ -82,13 +82,13 @@ module.exports = async app => {
 
     router.get("/banggia", (req, res)=>{
         console.log(req.query);
-        // if(req.session.keystoneListKey){
+        if(req.session.keystoneListKey){
             res.render("customer/index", {
                 title: "Bảng giá phụ kiện"
             })
-        // } else {
-        //     res.redirect("/thongbao");
-        // }
+        } else {
+            res.redirect("/thongbao");
+        }
     })
 
     router.get("/thongbao", (req, res) => {
