@@ -30,11 +30,11 @@
     <div>
         <div class="modal" id="modal_menu">
             <div class="modal-dialog">
-              <div class="modal-content">
+              <div :class="'modal-content border border-'+color_modal">
           
                 <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Thông báo</h4>
+                <div :class="'modal-header alert alert-'+color_modal">
+                    <h4 class="modal-title">{{title_modal}}</h4>
                     <button type="button" class="close" data-dismiss="modal" @click="jQuery('#modal_menu').hide()">&times;</button>
                 </div>
           
@@ -80,12 +80,35 @@
             counter: 0,
             counter_ui: false,
             cs: 0,
+            title_modal: "Tài khoản",
+            color_modal: "primary"
         },
         methods: {
+            ui_modal: function(mode){
+                switch(mode){
+                    case "LOGIN": {
+                        this.title_modal = "Đăng nhập";
+                        this.color_modal = "warning";
+                    } break;
+                    case "REGISTER": {
+                        this.title_modal = "Đăng ký tài khoản";
+                        this.color_modal = "primary";
+                    } break;
+                    case "OTP": {
+                        this.title_modal = "Xác thực tài khoản";
+                        this.color_modal = "success";
+                    } break;
+                    case "FORGOT": {
+                        this.title_modal = "Quên mật khẩu";
+                        this.color_modal = "danger";
+                    } break;
+                }
+            },
             changemode: function(a, phone){
                 var that = this;
                 this.mode=a;
                 if(a=="OTP"){
+                    this.ui_modal("OTP");
                     this.counter_ui = true;
                     this.counter = 0;
                     this.cs = setInterval(()=>{
@@ -108,6 +131,7 @@
                     jQuery("#modal_menu").show()
                 }
                 if(noti.type=='REGISTER'){
+                    this.ui_modal("REGISTER");
                     jQuery("#modal_menu").show();
                     this.mode = "REGISTER";
                 }
@@ -119,6 +143,7 @@
                 if(noti.type == "SUCCESS"){
                     this.notify = noti;
                     this.mode = "LOGIN";
+                    this.ui_modal("LOGIN");
                     return;
                 }
                 if(noti.type == "FAILURE"){

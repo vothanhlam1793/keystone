@@ -1,5 +1,5 @@
 async function checkRole(accessInput, roleCheck){
-    console.log("ACCESS INPUT", accessInput);
+    // console.log("ACCESS INPUT", accessInput);
     var a = await accessInput.context.executeGraphQL({
         query: `
           query check($id: ID!){
@@ -10,6 +10,7 @@ async function checkRole(accessInput, roleCheck){
                     canManageRoles
                     canManageCart
                     canManageOrders
+                    canManagePopUp
                 }
           }
         `,
@@ -47,6 +48,9 @@ module.exports.permission = {
     },
     canManageOrders: async function(accessInput){
         return await checkRole(accessInput, 'canManageOrders');
+    },
+    canManagePopUp: async function(accessInput){
+        return await checkRole(accessInput, 'canManagePopUp');
     },
 }
 

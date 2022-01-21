@@ -6,7 +6,6 @@
                 <div class="text-center border border-dark">
                     <div class="p-2 bg bg-dark">
                         <button type="button" class="btn btn-danger mb-2" @click="toggle()">Đóng</button>
-                        <!-- <img :src="'/images/modal/' + model.modal.img" class="img-fluid" alt="Quảng cáo"> -->
                         <%- include("form-thongbao.ejs"); %>
                     </div>
                 </div>
@@ -16,6 +15,22 @@
     </div>
 </div>
 <script>
+    var GET_POPUPS = `
+    query getPopup ($id: ID!, $now: String!) {
+        allPopups(where: {
+            AND: [{
+            notSeen_none: {id: $id}
+            },{
+            startDate_lt: $now
+            }, {
+            endDate_gt: $now
+            }]
+        }){
+            id
+            title
+        }
+    }
+    `
     class ModelModal {
         constructor(){
             this.modal = {};

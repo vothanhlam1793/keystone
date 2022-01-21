@@ -44,6 +44,10 @@ module.exports = {
             type: Checkbox,
             label: "Quản lý đơn hàng"
         },
+        canManagePopUp: {
+            type: Checkbox,
+            label: "Quản lý PopUp"
+        },
         assignedTo: {
             type: Relationship,
             ref: 'User.role',
