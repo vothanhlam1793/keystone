@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <%- include("../header.ejs", {title: "Kho ảnh"}) %>
+        <script src="/js/customer/model.js"></script>
+        <script src="/js/customer/cart.js"></script>
+     </head>
+    <body class="container-fluid">
+        <div>   
+            <%- include("../menu.ejs") %>
+        </div>
+        <div class="text-center mt-2">
+            <h4>Kho tài liệu</h4>
+        </div>
+        <div id="app_file">
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-action" v-for="file in files">Active item</li>
+                <li class="list-group-item list-group-item-action">Second item</li>
+                <li class="list-group-item list-group-item-action">Third item</li>
+            </ul>
+        </div>
+        <script>
+            var QUERY_GRAPHQL = `
+            {
+                allMediaFiles{
+                    id
+                    name
+                }
+            }
+            `
+            class CretaFile {
+                constructor(obj){
+                    this.id = obj.id;
+                    this.name = obj.name;
+                }
+                getName(){
+
+                }
+                getUrl(){
+
+                }
+            }
+            class CretaFiles {
+                constructor() {
+                    this.data = [];
+                    var that = this;
+                    graphql(QUERY_GRAPHQL, {}).then(data=>{
+                        that.data = data.data.allMediaFiles;
+                    })
+                }
+            }
+            var app_file = new Vue({
+                el: "#app_file",
+                data: {
+                    files: new CretaFiles(),
+                },
+            })
+        </script>
+    </body>
+</html>

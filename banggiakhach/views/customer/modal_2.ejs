@@ -1,0 +1,119 @@
+<div id="modal-modal">
+    <!-- <button id="btnOpenModal" @click="toggle()">Open Modal</button> -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="text-center border border-dark">
+                    <div class="p-2 bg bg-dark">
+                        <button type="button" class="btn btn-danger mb-2" @click="toggle()">Đóng</button>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-pause='true' data-interval="5000">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active" v-for="modal, index in model.modal" v-if="index==0">
+                                    <h2>{{modal.title}}</h2>
+                                    <div v-html="modal.content"></div>
+                                    <notseenmodal :id="modal.id"></notseenmodal>
+                                </div>
+                                <div class="carousel-item" v-for="modal, index in model.modal" v-if="index > 0">
+                                    <h2>{{modal.title}}</h2>
+                                    <div v-html="modal.content"></div>
+                                    <notseenmodal :id="modal.id"></notseenmodal>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="text-center justify-content-center d-flex">
+                        <div v-for="modal, index in model.modal" class="mx-1">
+                            <button 
+                            data-target="#carouselExampleIndicators" 
+                            :data-slide-to="index" 
+                            class="btn btn-secondary"
+                        >{{index+1}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    Vue.component('notseenmodal', {
+        props: ['id'],
+        data: function(){
+            return {
+                v_click: false
+            }
+        },
+        methods: {
+            notSeen: function(){
+                if(this.v_click){
+                    $.get("/notseenmodal?id=" + this.$props.id + "&notseen=1", function (data){
+                        console.log(data);
+                    });
+                } else {
+                    $.get("/notseenmodal?id=" + this.$props.id + "&notseen=0", function (data){
+                        console.log(data);
+                    });
+                }
+            }
+        },
+        template: `
+            <div>
+                <input type="checkbox" @change="notSeen" v-model="v_click"> Không hiển thị lại tin này
+            </div>
+        `
+    });
+    var GET_POPUPS = `
+    query getPopup ($id: ID!, $now: String!) {
+        allPopups(where: {
+            AND: [{
+            notSeen_none: {id: $id}
+            },{
+            startDate_lt: $now
+            }, {
+            endDate_gt: $now
+            }]
+        }){
+            id
+            title
+        }
+    }
+    `
+    class ModelModal {
+        constructor(){
+            this.modal = [];
+            this.onDataUpdate = function(){};
+            var that = this;
+            $.get("/modal", function(data){
+                that.modal = data.data.allPopups;
+                that.onDataUpdate();
+            });
+        }
+    }
+    var vm_modal = new Vue({
+        el: "#modal-modal",
+        data: {
+            model: new ModelModal(),
+        },
+        methods: {
+            toggle: function(){
+                jQuery("#myModal").toggle();
+            },
+            render: function(){
+                this.$forceUpdate();
+                this.openModal();
+            },
+            openModal: function(){
+                if(this.model.modal.length > 0){
+                    jQuery("#myModal").show();
+                } else {
+
+                }
+            }
+        },
+        mounted: function(){
+            this.model.onDataUpdate = this.render;
+        }
+    })
+</script>

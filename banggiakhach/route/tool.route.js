@@ -38,5 +38,12 @@ module.exports = app => {
             title: "Tính ổ cứng"
         })
     })
+
+    router.get("/document", async (req, res)=>{
+        res.render("customer/file/index");
+    });
+    router.get("/image", async (req, res)=>{
+        res.render("customer/image/index");
+    });
     app.use("/tool", router);
 }

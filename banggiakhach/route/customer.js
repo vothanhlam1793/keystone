@@ -1,6 +1,7 @@
 var url= "https://script.google.com/macros/s/AKfycbxpn0Yxexari6sRTbBrfQD6l619IjqjmOLSx8tQRze0Dv91z6gHz6HX2D5Zw8vz5I3Y/exec";
 var fetch = require("node-fetch");
 const fs = require('fs');
+const { addAbortSignal } = require("stream");
 
 var objProduct = {
     date: new Date("2000-01-01"),
@@ -70,9 +71,8 @@ async function getSheetData(pUrl, pNew){
     return objProduct.data;
 }
 
-module.exports = async app => {
+module.exports = (keystone) => {
     var router = require("express").Router(); 
-
     router.get("/", (req, res)=>{
         console.log(req.query);
         res.render("customer/homepage", {
@@ -97,12 +97,100 @@ module.exports = async app => {
         });
     });
 
-    router.get("/modal", (req, res)=>{
-        fs.readFile(__dirname + "/data/modal.json", (err, m) => {
-            if (err) throw err;
-            res.send(JSON.parse(m));
+    router.get("/modal", async (req, res)=>{
+        var QUERY_MODAL = ``;
+        if(req.session.keystoneListKey){
+            QUERY_MODAL = `
+            query getPopup ($id: ID!, $now: String!) {
+                allPopups(where: {
+                   AND: [{
+                    notSeen_none: {id: $id}
+                  },{
+                    startDate_lte: $now
+                  }, {
+                    endDate_gte: $now
+                  }]
+                }){
+                  id
+                  title
+                  content
+                }
+              }
+            `;
+        } else {
+            QUERY_MODAL = `
+            query getPopup ($id: ID!, $now: String!) {
+                allPopups(where: {
+                   AND: [{
+                    startDate_lte: $now
+                  }, {
+                    endDate_gte: $now
+                  }]
+                }){
+                  id
+                  title
+                  content
+                }
+              }
+            `;
+        }  
+        var c = await keystone.executeGraphQL({
+            context: keystone.createContext({skipAccessControl: true}),
+            query: QUERY_MODAL,
+            variables: {
+                id: req.session.keystoneItemId,
+                now: (new Date()).toISOString()
+            }
         });
-    })
+        res.send(c);
+    });
+
+    router.get("/notseenmodal", async(req, res) => {
+        if(req.session.keystoneItemId && req.query.id){
+            var GRAPHQL_NOT_SEEN = ``;
+            if(req.query.notseen == 1){
+                GRAPHQL_NOT_SEEN = `
+                    mutation addUserNotSeenPopUp($id: ID!, $idUser: ID!){
+                        updatePopup(id: $id, data: {
+                            notSeen: {
+                                connect: {id: $idUser}
+                            }
+                        }){
+                            id
+                            title
+                        }
+                    }
+                `;
+            } else {
+                GRAPHQL_NOT_SEEN = `
+                mutation addUserNotSeenPopUp($id: ID!, $idUser: ID!){
+                    updatePopup(id: $id, data: {
+                      notSeen: {
+                        disconnect: {id: $idUser}
+                      }
+                    }){
+                      id
+                      title
+                    }
+                }
+                `
+            }
+            var c = await keystone.executeGraphQL({
+                context: keystone.createContext({skipAccessControl: true}),
+                query: GRAPHQL_NOT_SEEN,
+                variables: {
+                    idUser: req.session.keystoneItemId,
+                    id: req.query.id
+                }
+            });
+            res.send(c);
+        } else {
+            res.send({
+                message: "Not Auth",
+                status: "ERROR"
+            })
+        }
+    });
 
     router.post("/modal", (req, res)=>{
         if(req.body.pwd != "asrkpvg7"){
@@ -194,5 +282,5 @@ module.exports = async app => {
     })
     require("../createData");
     getProducts(1);
-    app.use("/", router);
+    return router;
 }

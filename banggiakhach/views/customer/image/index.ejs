@@ -1,18 +1,16 @@
 <html>
     <head>
-        <%- include("header.ejs", {title: title}) %>
+        <%- include("../header.ejs", {title: "Kho ảnh"}) %>
         <script src="/js/customer/model.js"></script>
         <script src="/js/customer/cart.js"></script>
      </head>
     <body class="container-fluid">
         <div>   
-            <%- include("menu.ejs",{}) %>
+            <%- include("../menu.ejs") %>
         </div>
         <div class="text-center mt-2">
-            <h4>Tra giá nhanh</h4>
+            <h4>Kho ảnh</h4>
         </div>
-        <%- include("modal_2.ejs") %>
-        <%- include("temp.ejs") %>
-        <%- include("footer.ejs") %>
+
     </body>
 </html>

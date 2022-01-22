@@ -12,20 +12,33 @@ const {
   //   Wysiwyg
   } = require('@keystonejs/fields');
   const { Wysiwyg } = require('@keystonejs/fields-wysiwyg-tinymce');
+  
   const { permission, rules, isSignedIn } = require("./../access");
   module.exports = {
         fields: {
             title: {
-                type: Text
+                type: Text,
+                access: {
+                    update: permission.canManagePopUp
+                }
             },
             content: {
-                type: Wysiwyg
+                type: Wysiwyg,
+                access: {
+                    update: permission.canManagePopUp
+                }
             },
             startDate: {
                 type: CalendarDay,
+                access: {
+                    update: permission.canManagePopUp
+                }
             },
             endDate: {
                 type: CalendarDay,
+                access: {
+                    update: permission.canManagePopUp
+                }
             },
             notSeen: {
                 type: Relationship,
@@ -36,6 +49,5 @@ const {
         access: {
             create: permission.canManagePopUp,
             delete: permission.canManagePopUp,
-            update: permission.canManagePopUp
         }
   }

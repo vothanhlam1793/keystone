@@ -29,9 +29,8 @@ function middle(keystone, dev, distDir){
   app.use(express.static(path.join(__dirname,'public')))
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-
   require("./route/tool.route")(app);
-  require("./route/customer")(app);
+  app.use("/", require("./route/customer")(keystone));
   app.use("/baogia", require("./route/baogia"));
   app.use("/product", require("./route/product"));
   require("./app/routes/product.route")(app);

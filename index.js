@@ -19,6 +19,8 @@ const Product = require("./lists/Product");
 const ProductImage = require("./lists/ProductImage");
 const Role = require("./lists/Role");
 const Popup = require("./lists/Popup");
+const MediaImage = require("./lists/MediaImage");
+const MediaFile = require("./lists/MediaFile");
 const { customSchema, ForgottenPasswordToken } = require('./lists/ForgottenPasswordToken');
 
 const PROJECT_NAME = process.env.PROJECT_NAME;
@@ -45,6 +47,8 @@ keystone.createList('ProductImage', ProductImage);
 keystone.createList('Role', Role);
 keystone.createList('ForgottenPasswordToken', ForgottenPasswordToken);
 keystone.createList('Popup', Popup);
+keystone.createList('MediaImage', MediaImage);
+keystone.createList('MediaFile', MediaFile);
 
 keystone.extendGraphQLSchema(customSchema);
 
