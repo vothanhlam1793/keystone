@@ -11,7 +11,6 @@ const {
 } = require('@keystonejs/fields');
 const { Content } = require('@keystonejs/fields-content');
 const { S3Adapter } = require('@keystonejs/file-adapters');
-const { CloudinaryImage } = require('@keystonejs/fields-cloudinary-image');
 const { isSignedIn, permission } = require('../access');
 
 const CF_DISTRIBUTION_ID = 'cretatech';
@@ -38,6 +37,9 @@ module.exports = {
         name: {
             type: Text
         },
+        description: {
+          type: Text
+        },
         file: {
             type: File,
             adapter: fileAdapter,
@@ -51,6 +53,9 @@ module.exports = {
         },
         code: {
             type: Text,
+        },
+        linkCode: {
+          type:  Text
         }  
     },
     hooks: {

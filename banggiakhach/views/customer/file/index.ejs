@@ -1,8 +1,6 @@
 <html>
     <head>
-        <%- include("../header.ejs", {title: "Kho ảnh"}) %>
-        <script src="/js/customer/model.js"></script>
-        <script src="/js/customer/cart.js"></script>
+        <%- include("../header.ejs", {title: "Kho tài liệu"}) %>
      </head>
     <body class="container-fluid">
         <div>   
@@ -13,30 +11,169 @@
         </div>
         <div id="app_file">
             <ul class="list-group">
-                <li class="list-group-item list-group-item-action" v-for="file in files">Active item</li>
-                <li class="list-group-item list-group-item-action">Second item</li>
-                <li class="list-group-item list-group-item-action">Third item</li>
+                <file-list  v-for="file in files.data" :file="file"></file-list>
             </ul>
         </div>
         <script>
+            Vue.component('modal-input', {
+                props: ['id', 'file'],
+                data: function(){
+                    return {
+                        jQuery: jQuery,
+                        inp_code: "",
+                        error_content: ""
+                    }
+                },
+                methods: {
+                    download: function(){
+                        var a = this.$props.file.download(this.inp_code);
+                        if(a == "ERROR_CODE"){
+                            this.error_content = "Bạn nhập sai code cho tài liệu này rồi, nhập lại nhé!. :D";
+                        }
+                    }
+                },
+                template: `
+                    <div class="modal" :id="'modal_input_' + id">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">Có chút vấn đề</h4>
+                                <button type="button" class="close" @click="jQuery('#modal_input_' + id).hide()">&times;</button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="modal-body">
+                                <div>
+                                    <p>Tài liệu <strong>{{file.getName()}}</strong> có vẻ cần mã code khi tải về.</p>
+                                    <p>Bạn đã có mã code thì nhập và tải nhé</p>
+                                    <p class="text-danger">{{error_content}}</p>
+                                    <div class="input-group mb-3">
+                                        <input class="form-control" v-model="inp_code" placeholder="Nhập mã code" @change="error_content='';"></input>
+                                        <div class="input-group-append">
+                                            <button @click="download()" class="btn btn-info"><i class="material-icons">file_download</i></button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p>Bạn chưa có mã code? <a :href="file.getLinkCode()" target="_blank">Xem thêm chi tiết tại đây</a></p>    
+                                    </div>    
+                                </div>
+                            </div>
+
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" @click="jQuery('#modal_input_' + id).hide()">Đóng</button>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+                `
+            })
+            Vue.component('file-list', {
+                props: ['file'],
+                data: function(){
+                    return {
+
+                    }
+                },
+                methods: {
+                    download: function(){
+                        if(this.$props.file.download() == "ERROR"){
+                            // Yeu cau nhap ma code truoc khi download
+                            jQuery("#modal_input_" + this.$props.file.id).show();                            
+                        } else {
+                            // Tien hanh download
+
+                        }
+                    }
+                },
+                template: `
+                    <li class="list-group-item list-group-item-action">
+                        <div class="d-flex">
+                            <div class="mr-auto">
+                                <h5>{{file.getName()}}</h5>
+                                <p>{{file.getDescription()}}</p>
+                            </div>
+                            <div class="">
+                                <button 
+                                    class="btn btn-warning"
+                                    @click="download()"    
+                                >
+                                    <i class="material-icons">file_download</i>
+                                </button>
+                            </div>
+                        </div>
+                        <modal-input :id='file.id' :file="file"></modal-input>    
+                    </li>
+                `
+            })
             var QUERY_GRAPHQL = `
             {
                 allMediaFiles{
                     id
                     name
+                    file {
+                        publicUrl
+                    }
+                    code
+                    linkCode
+                    description
                 }
             }
+            `
+            var QUERY_FILE = `
+                query getMediaFile($id: ID!){
+                    MediaFile(where: {id: $id}){
+                        name
+                        code
+                        file {
+                            publicUrl
+                        }
+                        description
+                    }
+                }
             `
             class CretaFile {
                 constructor(obj){
                     this.id = obj.id;
                     this.name = obj.name;
+                    this.data = obj
                 }
                 getName(){
-
+                    return this.data.name || this.name;
+                }
+                getDescription(){
+                    return this.data.description;
                 }
                 getUrl(){
+                    return this.data.file.publicUrl;
+                }
+                fetch(){
+                    var that = this;
+                    graphql(QUERY_FILE, {id: this.id}).then(data=>{
+                        that.data = data.data.MediaFile;
+                    })
+                }
+                getLinkCode(){
+                    return this.data.linkCode;
+                }
+                download(code){
+                    if((this.data.code != null)){
+                        if(code == undefined){
+                            return "ERROR";
+                        } else {
+                            if(this.data.code !== code){
+                                return "ERROR_CODE";
+                            } else {
+                                return window.open(this.getUrl(), "_blank");
+                            }
+                        }
+                    } else {
 
+                        return window.open(this.getUrl(), "_blank");
+                    }
                 }
             }
             class CretaFiles {
@@ -44,7 +181,15 @@
                     this.data = [];
                     var that = this;
                     graphql(QUERY_GRAPHQL, {}).then(data=>{
-                        that.data = data.data.allMediaFiles;
+                        data.data.allMediaFiles.forEach(function(e){
+                            if(e.code == null){
+
+                            } else {
+                                // e.code = "";
+                                // e.file.publicUrl = "";
+                            }
+                            that.data.push(new CretaFile(e));
+                        })
                     })
                 }
             }
