@@ -17,9 +17,9 @@ Vue.component("otp", {
     methods: {
         otp: function(){
             console.log(this.code);
-            if(this.code.length != 6){
+            if(this.code.length != 4){
                 this.$emit('notify', {
-                    content: "OTP có 6 ký tự",
+                    content: "OTP có 4 ký tự",
                     type: "DANGER"
                 })
             }

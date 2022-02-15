@@ -12,4 +12,3 @@ function graphql(query, variables = {}) {
         return result.json();
     });
 }
-  

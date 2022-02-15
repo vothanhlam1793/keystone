@@ -1,6 +1,9 @@
 <html>
     <head>
         <%- include("../header.ejs", {title: "Kho tài liệu"}) %>
+        <script>
+            var REQUIRED_URL_BEFORE_LOGIN = "/tool/document";
+        </script>
      </head>
     <body class="container-fluid">
         <div>   
@@ -10,9 +13,19 @@
             <h4>Kho tài liệu</h4>
         </div>
         <div id="app_file">
-            <ul class="list-group">
-                <file-list  v-for="file in files.data" :file="file"></file-list>
-            </ul>
+            <div v-if="SIGNED == 'true'">
+                <ul class="list-group">
+                    <file-list  v-for="file in files.data" :file="file"></file-list>
+                </ul>
+            </div>
+            <div v-else>
+                <div class="alert alert-info">
+                    <h4>Yêu cầu đăng nhập</h4>
+                    <p>Trang tài liệu yêu cầu đăng nhập để xem tiếp thông tin!.</p>
+                    <p>Bạn đăng nhập <button class="btn btn-warning" onclick="app_collapsibleNavbar.mode='LOGIN'; jQuery('#modal_menu').show();">Tại đây</button></p>
+                    <p>Nếu chưa có tài khoảng bạn đăng ký nhé <button class="btn btn-success" onclick="app_collapsibleNavbar.notify_login({type: 'REGISTER'}); jQuery('#myModal').toggle();">Đăng ký</button></p>
+                </div>
+            </div>
         </div>
         <script>
             Vue.component('modal-input', {
@@ -197,6 +210,7 @@
                 el: "#app_file",
                 data: {
                     files: new CretaFiles(),
+                    SIGNED : localStorage.SIGNED
                 },
             })
         </script>

@@ -136,7 +136,12 @@
                     this.mode = "REGISTER";
                 }
                 if(noti.type=="SUCCESS"){
-                    location.href="/banggia"
+                    if(REQUIRED_URL_BEFORE_LOGIN){
+                        location.href=REQUIRED_URL_BEFORE_LOGIN;
+                    } else {
+                        location.href="/banggia";
+                    }
+
                 }
             },
             notify_otp: function(noti){
