@@ -41,7 +41,7 @@ Vue.component('register', {
                 username: s_user
             }).then(a=>{
                 this.$emit("notify", {
-                    content: "Tin nhắn OTP đang gởi đến - bạn đợi khoảng 30 giây nhé!",
+                    content: "Xác thực qua điện thoại - chờ cuộc gọi đến ...",
                     type: "INFO"
                 })
                 this.$emit('changemode', "OTP");
@@ -99,7 +99,7 @@ Vue.component('register', {
                 if(a.data.createUser.id){
                     // Đăng ký thành công
                     this.$emit("notify", {
-                        content: "Tin nhắn OTP đang gởi đến - bạn đợi khoảng 30 giây nhé!",
+                        content: "Xác thực qua điện thoại - chờ cuộc gọi đến ...",
                         type: "INFO"
                     })
                     this.$emit('changemode', "OTP");

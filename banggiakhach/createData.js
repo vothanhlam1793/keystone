@@ -29,8 +29,6 @@ jsonData.forEach(function(file){
     } catch (e) {
 
     }
-    // console.log(nColumn, pColumn);
-    // console.log("COUNTER:", file.config.fromRow, file.config.toRow)
     for(var i = parseInt(file.config.fromRow); i <= parseInt(file.config.toRow); i++){
         var cap1 = 0;
         var cap2 = 0;

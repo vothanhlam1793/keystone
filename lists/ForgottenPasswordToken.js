@@ -2,10 +2,11 @@ const { v4: uuid } = require('uuid');
 
 function getOTP(){
     var a = Math.round(Math.random()*10000000).toString();
-    return a.substring(0, 6);
+    return a.substring(0, 4);
 }
 
 const { SMS } = require("./../lib/sms");
+var callOTP = require("./../lib/call").callOTP;
 const { sendEmail } = require("./../lib/mail");
 const {
     File,
@@ -94,11 +95,14 @@ module.exports.ForgottenPasswordToken = {
             };
         
             console.log(props);
-            var sms = new SMS();
-            await sms.send(User.phone, "OTP Creta.VN: " + forgotPasswordKey);
+            // var sms = new SMS();
+            // await sms.send(User.phone, "OTP Creta.VN: " + forgotPasswordKey);
+            callOTP(User.phone, forgotPasswordKey);
         },
       },
 }
+
+
 
 module.exports.customSchema = {
     queries: [
@@ -132,6 +136,8 @@ module.exports.customSchema = {
       {
         schema: 'startPasswordRecovery(username: String!): ForgottenPasswordToken',
         resolver: async (obj, { username }, context) => {
+
+          // Tạo ra một token mới
           const token = getOTP();
             console.log(token);
           const tokenExpiration =
@@ -141,6 +147,7 @@ module.exports.customSchema = {
           const requestedAt = new Date(now).toISOString();
           const expiresAt = new Date(now + tokenExpiration).toISOString();
   
+          // tìm User
           const { errors: userErrors, data: userData } = await context.executeGraphQL({
             context: context.sudo(),
             query: `
