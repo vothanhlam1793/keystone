@@ -1,0 +1,39 @@
+<div id="find_search" class="border p-2">
+    <h3>{{title}}</h3>
+    <!-- KHUNG TIFM KIEEMS -->
+    <div class="">
+        <input class="form-control" placeholder="Nhập tên sản phẩm" v-model="name">
+        <div class="text-center my-2">
+            <button class="btn btn-primary" @click="findProduct(name)">Tìm kiếm</button>
+        </div>
+    </div>
+    <br>
+    <!-- Khung kết quả sản phẩm -->
+    <div>
+        <div class="">
+            <table class="table table-hover">
+                <tr v-for="p in fProducts" @click="showResult(p)">
+                    <td>{{p.getName()}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    var app_find_search = new Vue({
+        el: "#find_search",
+        mixins: [_support_search],
+        data: {
+            title: "Từ dữ liệu",
+            name: "",
+        },
+        methods: {
+            showResult: function(p){
+                app_find_result.showResult(p);
+            }
+        },
+        created(){
+
+        }
+    })
+</script>

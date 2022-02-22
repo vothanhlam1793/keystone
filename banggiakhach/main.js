@@ -36,6 +36,7 @@ function middle(keystone, dev, distDir){
   require("./app/routes/product.route")(app);
   require("./app/routes/cart.route")(app);
   app.use("/user", require("./route/user").router(keystone));
+  app.use("/pc-creta", require("./route/pc-creta/index").router(keystone));
 
   app.get('*', function(req, res){
     res.redirect("/");

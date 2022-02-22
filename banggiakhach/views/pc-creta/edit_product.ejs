@@ -1,0 +1,127 @@
+<div id="edit_product">
+    <div v-if="app">
+    <div class="" v-if="product.load">
+        <div class="d-flex">
+            <div class="mr-auto">
+                <h2>{{product.getName()}}</h2>
+                <p>Giá catalog: {{numberWithCommas(product.getPrice() | 0)}}</p>
+            </div>
+            <div class="p-2">
+                <button @click="show()" class="btn btn-warning p-2">Chỉnh</button>
+            </div>
+        </div>
+    </div>
+    <div class="">
+        <h2>Đặc tính</h2>
+    </div>
+    <div class="row">
+        <div class="col-3 my-2" v-for="type in types">
+            <div v-if="type.load && product.load">
+                <attributes-manage :type="type" :product="product"></attributes-manage>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div class="modal" :id="idModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" v-if="product.load">
+        
+                <!-- Modal Header -->
+                <div class="modal-header">
+                <h4 class="modal-title">{{product.getName()}}</h4>
+                <button type="button" class="close" data-dismiss="modal" @click="jQuery('#' + idModal).hide()">&times;</button>
+                </div>
+        
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div>
+                        <label>Tên</label>
+                        <input class="form-control" v-model="name" :placeholder="product.getName()">
+                    </div>
+                    <div>
+                        <label>Giá</label>
+                        <input class="form-control" v-model="price" :placeholder="product.getPrice()">
+                    </div>
+                </div>
+        
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col">
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success" data-dismiss="modal" @click="updateProduct()">Lưu lại</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" @click="jQuery('#' + idModal).hide()">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    var QL_GET_TYPES = `
+    query {
+        allProductTypes(where: {type_contains: ":"}){
+            id
+            type
+            description
+        }
+    }
+    `
+    var app_edit_product = new Vue({
+        el: "#edit_product",
+        mixins: [_support_vue],
+        data: {
+            attributes: [],
+            types: [],
+            product: {load: false},
+            idModal: Math.round(Math.random()*10000000).toString(),
+            jQuery: $,
+            name: "",
+            price: 0,
+            count: 0,
+            app: false
+        },
+        methods: {
+            show: function(){
+                this.name = this.product.getName();
+                this.price = this.product.getPrice();
+                jQuery('#' + this.idModal).show();
+            },
+            updateProduct: function(){
+                var that = this;
+                that.count = 0;
+                this.product.setName(this.name, function(){
+                    that.count++;
+                    if(that.count >= 2){
+                        that.count = 0;
+                        that.$forceUpdate();
+                    }
+                });
+                this.product.setPrice(this.price, function(){
+                    that.count++;
+                    if(that.count >= 2){
+                        that.count = 0;
+                        that.$forceUpdate();
+                    }
+                });
+                jQuery('#' + this.idModal).hide();
+            },
+            begin: function(id){
+                this.product =  new PCProduct(id);
+                this.app = true;
+            }
+        },
+        created(){
+            var that = this;
+            graphql(QL_GET_TYPES).then(res=>{
+                res.data.allProductTypes.forEach(function(t){
+                    that.types.push(new AttributeType(t.id));
+                })
+            })
+        }
+    })
+</script>

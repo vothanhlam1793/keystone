@@ -1,0 +1,60 @@
+<div id="find_result" class="border p-2">
+    <div v-if="app && product.load">
+        <div>
+            <h3>{{product.getName()}}</h3>
+            <p>Giá: {{numberWithCommas(product.getPrice())}}</p>
+        </div>
+        <!-- Tinh chat -->
+        <div>
+            <table class="table table-hover table-bordered table-striped">
+                <tr>
+                    
+                </tr>
+                <tr v-for="attribute in product.getAttributes()">
+                    <td>{{attribute.key}}</td>
+                    <td>{{attribute.label}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    Vue.component('show-attribute', {
+        props: ['attribute'],
+        data: function(){
+            return {
+
+            }
+        },
+        methods: {
+
+        },
+        template: `
+            <div>
+                <div>
+                    
+                </div>
+
+            </div>
+        `
+    })
+
+    var app_find_result = new Vue({
+        el: "#find_result",
+        mixins: [_support_vue],
+        data: {
+            title: "Kết quả tìm kiếm",
+            product: {},
+            app: false,
+        },
+        methods: {
+            showResult: function(p){
+                this.product = p;
+                this.app = true;
+            }
+        },
+        created(){
+
+        }
+    })
+</script>

@@ -35,11 +35,11 @@ module.exports = {
                 update: permission.canManageUsers
             },
         },
-        products: {
-            type: Relationship,
-            ref: 'Product.user',
-            many: true
-        },
+        // products: {
+        //     type: Relationship,
+        //     ref: 'Product.user',
+        //     many: true
+        // },
         username: {
             type: Text,
             isRequired: true,

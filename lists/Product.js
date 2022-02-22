@@ -17,7 +17,8 @@ module.exports = {
     fields: {
         name: {
             type: Text,
-            isRequired: true
+            isRequired: true.valueOf,
+            isUnique: true
         },
         description: {
             type: Wysiwyg
@@ -39,9 +40,14 @@ module.exports = {
         price: {
             type: Integer
         },
-        user: {
+        attributes: {
             type: Relationship,
-            ref: 'User.products'
+            ref: 'ProductAttribute.products',
+            many: true
+        },
+        type: {
+            type: Relationship,
+            ref: 'ProductType',
         }
     },
     access: {

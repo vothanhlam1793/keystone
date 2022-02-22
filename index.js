@@ -49,6 +49,8 @@ keystone.createList('ForgottenPasswordToken', ForgottenPasswordToken);
 keystone.createList('Popup', Popup);
 keystone.createList('MediaImage', MediaImage);
 keystone.createList('MediaFile', MediaFile);
+keystone.createList('ProductAttribute', require("./lists/ProductAttribute"));
+keystone.createList('ProductType', require("./lists/ProductType"));
 
 keystone.extendGraphQLSchema(customSchema);
 

@@ -1,0 +1,146 @@
+<div id="create_product">
+    <div v-if="app">
+        <div class="p-3">
+            <div class="text-center">
+                <h3>Tạo sản phẩm</h3>
+            </div>
+            <div>
+                <label>Tên</label>
+                <input class="form-control" v-model="name" placeholder="Tên hàng hoá">
+            </div>
+            <div class="mt-4">
+                <label>Giá</label>
+                <input class="form-control" v-model="price" placeholder="Giá bán lẻ">
+            </div>
+            <div class="text-center my-3">
+                <button class="btn btn-primary" @click="findProduct();">Tìm kiếm</button>
+            </div>
+        </div>
+    </div>
+    <!-- The Modal -->
+    <div class="modal" :id="idModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" v-if="">
+        
+                <!-- Modal Header -->
+                <div class="modal-header">
+                <h4 class="modal-title">THÔNG BÁO</h4>
+                <button type="button" class="close" data-dismiss="modal" @click="jQuery('#' + idModal).hide()">&times;</button>
+                </div>
+        
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div v-if="fProducts.length > 0">
+                        <div>
+                            <p>Đã tìm thấy <strong>{{fProducts.length}}</strong> mã</p>
+                        </div>
+                        <div class="">
+                            <table class="table">
+                                <tr>
+                                    <th>Tên</th>
+                                    <th>Giá</th>
+                                    <th></th>
+                                </tr>
+                                <tr v-for="p in fProducts">
+                                    <td>{{p.getName()}}</td>
+                                    <td>{{numberWithCommas(p.getPrice())}}</td>
+                                    <td><button
+                                        class="btn btn-warning"
+                                        @click="beginEdit(p.id)"
+                                        >Chỉnh sửa</button></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div>
+                            <p>Không có mã trùng - tạo mã mới nhé!</p>
+                        </div>
+                        <div>
+                            <h5>Thông tin:</h5>
+                            <p>Tên: {{name}}</p>
+                            <p>Giá: {{numberWithCommas(price)}}</p>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary" @click="createProduct()">Tạo mới sản phẩm</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col">
+                            <div class="text-center">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" @click="jQuery('#' + idModal).hide()">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // var app_edit_product = {};
+    var QL_CREATE_PRODUCT = `
+    mutation ($name: String, $price: Int){
+        createProduct(data: {name: $name, price: $price}){
+            id
+            name
+            price
+        }
+    }
+    `
+    var app_create_product = new Vue({
+        el: "#create_product",
+        mixins: [_support_vue],
+        data: {
+            name: "",
+            price: "",
+            idModal: Math.round(Math.random()*10000000).toString(),
+            jQuery: $,
+            fProducts: [],
+            app: true
+        },
+        methods: {
+            findProduct: function(){
+                var that = this;
+                that.fProducts = [];
+                graphql(`query {
+                        allProducts(search: "` + this.name + `") {
+                            id
+                            name
+                            price
+                        }
+                    }
+                `).then(res=>{
+                    res.data.allProducts.forEach(function(product){
+                        that.fProducts.push(new PCProduct(product));
+                    })
+                    that.jQuery("#" + that.idModal).show();
+                });
+            },
+            createProduct: function(){
+                // Tạo mới
+                var that = this;
+                graphql(QL_CREATE_PRODUCT, {
+                    name: this.name,
+                    price: parseInt(this.price)
+                }).then(res1=>{
+                    that.beginEdit(res1.data.createProduct.id);
+                    that.name = "";
+                    that.price = 0;
+                });
+            },
+            beginEdit: function(id){
+                app_edit_product.begin(id);   
+                this.app = false;
+                this.jQuery("#" + this.idModal).hide();
+            }
+        },
+        created(){
+
+        }
+    })
+</script>
