@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[47],{725:function(a,t,n){"use strict";n.r(t);var o=n(740),c=n(744);t.default=({data:a,field:{config:t}})=>a?t.format?Object(o.a)(Object(c.a)(a),t.format):a:null}}]);

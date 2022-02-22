@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[45],{335:function(t,n,r){"use strict";r.r(n),r.d(n,"Node",(function(){return p})),r.d(n,"type",(function(){return i}));var e=r(5),o=r(1);let i="paragraph";function p({attributes:t,children:n}){return Object(o.jsx)("p",Object(e.a)({},t,{css:{":first-of-type":{marginTop:0},":last-of-type":{marginBottom:0}}}),n)}}}]);
