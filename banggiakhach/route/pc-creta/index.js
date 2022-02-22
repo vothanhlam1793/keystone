@@ -8,5 +8,11 @@ module.exports.router = (keystone) => {
     router.get("/find", (req, res)=>{
         res.render("pc-creta/find/index");
     });
+    router.get("/compare", (req, res)=>{
+        res.render("pc-creta/compare/index");
+    });
+    router.get("/types", (req, res)=>{
+        res.render("pc-creta/types/index");
+    });
     return router;
 }

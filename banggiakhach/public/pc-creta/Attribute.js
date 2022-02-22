@@ -79,6 +79,7 @@ class AttributeType {
         this.type = {};
         this.attributes = [];
         this.load = false;
+        this.value = [];
         var that = this;
         this.fetch(function(){
             that.load = true;

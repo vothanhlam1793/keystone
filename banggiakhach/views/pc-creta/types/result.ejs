@@ -1,0 +1,160 @@
+<div id="types_result">
+    <h3>Tìm được {{products.length}} sản phẩm</h3>
+    <table class="table  table-striped table-bordered">
+        <tr>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Chi tiết</th>
+        </tr>
+        <tr v-for="product in products">
+            <td>{{product.getName()}}</td>
+            <td>{{numberWithCommas(product.getPrice())}}</td>
+            <td><button class="btn btn-info" @click="showDetail(product)">Chi tiết</button></td>
+        </tr>
+    </table>
+</div>
+<div>
+    <div class="modal" id="modalTypeResult">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+      
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Thông tin sản phẩm</h4>
+              <button type="button" class="close" data-dismiss="modal" onclick="$('#modalTypeResult').hide()">&times;</button>
+            </div>
+      
+            <!-- Modal body -->
+            <div class="modal-body">
+                <%- include("../find/result.ejs"); %>
+            </div>
+      
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#modalTypeResult').hide()">Close</button>
+            </div>
+      
+          </div>
+        </div>
+    </div>
+</div>
+<script>
+    var QL_GET_PRODUCT = `
+    query {
+        allProductAttributes (where: { OR: [
+            {id: "6212622663b2c407cff97edb"},
+            {id: "6212626f63b2c407cff97f41"}
+        ]}){
+            id
+            products {
+            id
+            name
+            price
+            attributes {
+                id
+                value
+                key
+                label
+            }
+            }
+        }
+    }    
+    
+    `
+    var app_types_result = new Vue({
+        el: "#types_result",
+        mixins: [_support_vue],
+        data: {
+            products: [],
+        },
+        methods: {
+            showDetail(product){
+
+                $("#modalTypeResult").show();
+                app_find_result.showResult(product);
+            },
+            find(ids){
+                var str = "";
+                ids.forEach(function(id, index){
+                    if(index > 0){
+                        str += ",";
+                    }
+                    str += "{id: \"" + id + "\"}";
+
+                })
+                var QL = `
+                query {
+        allProductAttributes (where: { OR: [
+                ` + str + `
+                ]}){
+            id
+            type {
+                id
+            }
+            products {
+            id
+            name
+            price
+            attributes {
+                id
+                value
+                key
+                label
+            }
+            }
+        }
+    }    
+                `
+                var that = this;
+                graphql(QL).then(res=>{
+                    var ret = [];
+                    // Chia thanh nhom theo types
+                    var types = {};
+                    res.data.allProductAttributes.forEach(function(attr){
+                        if(types[attr.type.id] == undefined){
+                            types[attr.type.id] = {
+                                attrs: [],
+                                products: []
+                            };
+                        }
+                        types[attr.type.id].attrs.push(attr);
+                    });
+
+                    // Nhom san pham cung nhom lai
+                    for (const [key, value] of Object.entries(types)) {
+                        value.attrs.forEach(function(attr){
+                            attr.products.forEach(function(product){
+                                var index = value.products.findIndex(function(e){
+                                    return e.id == product.id;
+                                })
+                                if(index == -1){
+                                    value.products.push(product);
+                                }
+                            })
+                        })
+                    }
+
+                    // Loai san pham khac nhom ra
+                    var ret = [];
+                    console.log(types);
+                        types[res.data.allProductAttributes[0].type.id].products.forEach(function(product){
+                            var temp = true;
+                            for (const [key, value] of Object.entries(types)) {
+                                var index = value.products.findIndex(function(p){
+                                    return p.id == product.id;
+                                });
+                                if(index < 0){
+                                    temp = false;
+                                }
+                            };
+                            if(temp){
+                                ret.push(new PCProduct(product));
+                            }
+                        });
+
+                    that.products = ret;
+                })
+            }
+        }
+    })
+</script>

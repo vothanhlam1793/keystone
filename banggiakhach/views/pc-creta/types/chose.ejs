@@ -1,0 +1,62 @@
+<div id="type_chose">
+    <div>
+        <h3>Chọn đặc tính</h3>
+    </div>
+    <div class="">
+        <div class="my-2 border border-primary rounded p-1" v-for="type in types">
+            <div>
+                <h3>{{type.getName()}}</h3>
+            </div>
+            <div v-if="type.load">
+                <div class="d-flex flex-wrap">
+                    <div class="p-2" v-for="attribute in type.getAttributes()">
+                        <input type="checkbox" 
+                            :value="attribute.id"
+                            v-model="type.value"
+                            @change='change(type.value, attribute.id)'
+                            :id="'idcb' + attribute.id"
+                        >
+                        <label :for="'idcb' + attribute.id">{{attribute.label}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var QL_GET_TYPES = `
+    query {
+        allProductTypes(where: {type_contains: ":"}){
+            id
+            type
+            description
+        }
+    }
+    `
+    var app_type_chose = new Vue({
+        el: "#type_chose",
+        mixins: [],
+        data: {
+            types: []
+        },
+        methods: {
+            change: function(){
+                var a = [];
+                this.types.forEach((type)=>{
+                    type.value.forEach((v)=>{
+                        a.push(v);
+                    })
+                });
+                app_types_result.find(a);
+            },
+        },
+        created(){
+            var that = this;
+            graphql(QL_GET_TYPES).then(res=>{
+                res.data.allProductTypes.forEach(function(t){
+                    that.types.push(new AttributeType(t.id));
+                })
+            })
+        }
+    })
+</script>

@@ -1,0 +1,49 @@
+<div id="compare_result">
+    <div v-if="products.length > 0">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>Tính chất</th>
+                <th v-for="product in products"><span class="badge badge-secondary btn btn-secondary" @click="removeProduct(product)">x</span><br>{{product.getName()}}</th>
+            </tr>
+            <tr v-for="type in types">
+                <td>{{type.name}}</td>
+                <td v-for="product in products">
+                    <ul>
+                        <li v-for="attr in product.getAttribute(type.id)">{{attr.label}}</li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script>
+    var app_compare_result = new Vue({
+        el: "#compare_result",
+        mixins: [_mixin_attribute],
+        data: {
+            products: []
+        },
+        methods: {
+            add: function(p){
+                if(this.products.length > 3){
+                    return;
+                }
+                this.products.push(p);
+            },
+            removeProduct: function(p){
+                var index = -1;
+                this.products.forEach(function(eProduct, i){
+                    if(eProduct.id == p.id){
+                        index = i;
+                    }
+                });
+                if(index > -1){
+                    this.products.splice(index, 1);
+                }
+            }
+        },
+        create(){
+            
+        }
+    })
+</script>

@@ -142,6 +142,15 @@ class PCProduct {
     getAttributes(){
         return this.product.attributes;
     }
+    getAttribute(idType){
+      var ret = [];
+      this.product.attributes.forEach(function(attr){
+        if(attr.type.id == idType){
+          ret.push(attr);
+        }
+      })
+      return ret;
+    }
     addAttributes(ids){
         graphql(createQLConnect(ids), {id: this.id}).then(res=>{
             

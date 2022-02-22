@@ -36,6 +36,10 @@ module.exports = {
             ref: "Product.attributes",
             many: true,
             label: "Kệ đi, nó tự cập nhật"
+        },
+        forProductType: {
+            type: Relationship,
+            ref: 'ProductType'
         }
     },
     access: {
