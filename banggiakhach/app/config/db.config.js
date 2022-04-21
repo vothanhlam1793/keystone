@@ -1,3 +1,3 @@
 module.exports = {
-    url: "mongodb://node.creta.work:30042/banggiakhach"
+    url: process.env.MONGO_URL_APP
 };

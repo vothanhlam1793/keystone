@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>EXCEL TEST</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="/js/graphql.js"></script>
+        <%- include("../extend_header.ejs"); %>
+    </head>
+    <body class="container-fluid">
+        <div>
+            <a href="/pc-creta/upload">Home</a> | <a href="/pc-creta/lists">Lists</a>
+        </div>
+        <div id="lists">
+            <div class="row mb-3">
+                <div class="col">
+                    <label>Chọn file</label>
+                    <select v-model="file" @change="loadFile()" class="form-control">
+                        <option v-for="f,index in files" :value="index">{{f.name}}</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Chọn sheet</label>
+                    <select v-model="ws" class="form-control" @change="loadWorksheet()">
+                        <option v-for="worksheet in workbook.SheetNames" :value="worksheet">{{worksheet}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="">
+                <table class="table table-bordered">
+                    <tr>
+                        <td>1. Tên</td>
+                        <td>2. Giá</td>
+                        <td>3. Mô tả</td>
+                        <td>9. Tạo mới</td>
+                        <td>0. Lưu lại</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div style="overflow: auto; height: 500;" class="border border-dark">
+                        <div :class="colorMachine(eMachine.NAME)" @click="keyCode(eKey.NAME)">
+                            <label>Tên</label>
+                            <p>{{product.name}}</p>
+                        </div>
+                        <div  :class="colorMachine(eMachine.PRICE)" @click="keyCode(eKey.PRICE)">
+                            <label>Giá</label>
+                            <p>{{product.price}}</p>
+                        </div>
+                        <div  :class="colorMachine(eMachine.DESCRIPTION)" @click="keyCode(eKey.DESCRIPTION)">
+                            <label>Mô tả</label>
+                            <p v-for="v in product.description"><button @click="product.description.splice(product.description.indexOf(v),1)">x</button>{{v}}</p>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div style="overflow: auto; height: 500;" class="border border-dark">
+                        <table class="table-bordered table">
+                            <tr v-for="row in worksheet">
+                                <td v-for="col in row" @click="pushData(col)">{{col}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('keydown', function(event) {
+                app2.keyCode(event.keyCode);
+                return;
+            });
+        </script>
+        <script src="/pc-creta/basic/app2.js"></script>
+    </body>
+</html>

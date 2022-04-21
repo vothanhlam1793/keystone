@@ -21,9 +21,11 @@ const Role = require("./lists/Role");
 const Popup = require("./lists/Popup");
 const MediaImage = require("./lists/MediaImage");
 const MediaFile = require("./lists/MediaFile");
+const FileLocal = require("./lists/FileLocal");
 const { customSchema, ForgottenPasswordToken } = require('./lists/ForgottenPasswordToken');
 
 const PROJECT_NAME = process.env.PROJECT_NAME;
+// console.log(process.env)
 const adapterConfig = { 
   mongoUri: process.env.MONGO_URL,
   "user": process.env.MONGO_USER,
@@ -49,6 +51,7 @@ keystone.createList('ForgottenPasswordToken', ForgottenPasswordToken);
 keystone.createList('Popup', Popup);
 keystone.createList('MediaImage', MediaImage);
 keystone.createList('MediaFile', MediaFile);
+keystone.createList('FileLocal', FileLocal);
 keystone.createList('ProductAttribute', require("./lists/ProductAttribute"));
 keystone.createList('ProductType', require("./lists/ProductType"));
 

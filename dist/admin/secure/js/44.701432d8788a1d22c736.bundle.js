@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[44],{493:function(n,t,e){"use strict";e.r(t),e.d(t,"Node",(function(){return c})),e.d(t,"type",(function(){return u}));var i=e(0),r=e.n(i);let u="list-item";function c({attributes:n,children:t}){return r.a.createElement("li",n,t)}}}]);

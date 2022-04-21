@@ -29,6 +29,8 @@ function middle(keystone, dev, distDir){
   app.use(express.static(path.join(__dirname,'public')))
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // TOOL
   require("./route/tool.route")(app);
   app.use("/", require("./route/customer")(keystone));
   app.use("/baogia", require("./route/baogia"));
@@ -40,9 +42,6 @@ function middle(keystone, dev, distDir){
 
   app.get('*', function(req, res){
     res.redirect("/");
-    // res.render("customer/index", {
-    //   title: "Bảng giá phụ kiện"
-    // })
   });
   return app;
 }

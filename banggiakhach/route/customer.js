@@ -280,6 +280,10 @@ module.exports = (keystone) => {
             title: "Giỏ hàng"
         })
     })
+
+    router.get("/test", (req, res) => {
+        res.render("test");
+    })
     require("../createData");
     getProducts(1);
     return router;

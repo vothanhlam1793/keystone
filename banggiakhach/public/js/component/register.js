@@ -45,7 +45,8 @@ Vue.component('register', {
                     type: "INFO"
                 })
                 this.$emit('changemode', "OTP");
-            })
+            });
+            localStorage.setItem("call_back_otp", s_user);
         },
         checkUser: function(){
             var that = this;

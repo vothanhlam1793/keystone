@@ -1,0 +1,234 @@
+<div id="app_login">
+    <div v-if="auth">
+        <show-user></show-user>
+        <button-logout></button-logout>
+    </div>
+    <div v-else>
+        <div v-if="state != 'REGISTER'">
+            <button @click="$store.dispatch('changeState', 'REGISTER')">Register</button>
+            <login-page-1></login-page-1>
+        </div>
+        <div v-else>
+            <button @click="$store.dispatch('changeState', 'LOGIN')">Login</button>
+            <register-page></register-page>
+        </div>
+    </div>
+</div>
+
+<script>
+    Vue.component("button-logout", {
+        template: `
+            <div>
+                <button @click="logout()">Log out</button>    
+            </div>
+        `,
+        methods: {
+            logout(){
+                this.$store.dispatch("logout");
+            }
+        }
+    })
+    Vue.component("show-user", {
+        template: `
+            <div>
+                <table class="table">
+                    <tr>
+                        <td>Tên</td>
+                        <td>{{user.name}}</td>    
+                    </tr>
+                    <tr>
+                        <td>Điện thoại</td>
+                        <td>{{user.phone}}</td>    
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{user.email}}</td>    
+                    </tr>    
+                </table>
+            </div>
+        `,
+        computed: {
+            user(){
+                return this.$store.state.user;
+            }
+        }
+    })
+    Vue.component("login-page-1", {
+        data(){
+            return {
+                username: "",
+                password: ""
+            }
+        },
+        methods: {
+            login(){
+                var SIGNIN = `
+                    mutation signin($identity: String, $secret: String) {
+                        authenticate: authenticateUserWithPassword(username: $identity, password: $secret) {
+                            item {
+                            id
+                            }
+                        }
+                    }
+                `
+                var that = this;
+                graphql(SIGNIN, {
+                    identity: this.username,
+                    secret: this.password
+                }).then(a => {
+                    if(!a.data.authenticate){
+                        alert("Tên đăng nhập hoặc mật khẩu bị sai");
+                    } else {
+                        that.$store.dispatch("checkUser");
+                    }
+                });
+            }
+        },
+        template: `
+        <div>
+            <div class="text-center my-3">
+                <h4>Đăng nhập</h4>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">phone</i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Phone" v-model="username" v-on:keyup.enter="login()">
+            </div>
+            <div class="input-group mb-3" >
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">lock</i></span>
+                </div>
+                <input type="password" class="form-control" placeholder="Mật khẩu" v-model="password" v-on:keyup.enter="login()">
+            </div>
+            <div class="text-center my-3">
+                <button class="btn btn-primary" @click="login()">Đăng nhập</button>
+            </div>
+        </div>      
+        `
+    })
+    Vue.component("show-counter", {
+        template: `
+            <div>
+                {{counter}}    
+            </div>
+        `,
+        computed: {
+            counter(){
+                return this.$store.state.counter;
+            }
+        }
+    });
+    Vue.component("btn-counter", {
+        methods: {
+            up(){
+                this.$store.dispatch("counterCal", {
+                    type: true,
+                    number: 3
+                });
+            }
+        },
+        template: `
+            <div>
+                <button @click="up()">UP</button>    
+            </div>
+        `
+    })
+
+    Vue.component('register-page',{
+        template: `
+        <div>
+            <div class="text-center my-3">
+                <h4>Đăng ký tài khoản</h4>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">person</i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Họ" v-model="firstname">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">person</i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Tên"  v-model="lastname">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">email</i></span>
+                </div>
+                <input type="email" class="form-control" placeholder="Email" v-model="email">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">phone</i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Điện thoại" v-model="phone">
+            </div>           
+            <div class="input-group mb-3" >
+                <div class="input-group-prepend">
+                <span class="input-group-text"><i class="material-icons">lock</i></span>
+                </div>
+                <input type="password" class="form-control" placeholder="Mật khẩu" v-model="password">
+            </div>
+            <div class="text-center my-3">
+                <button class="btn btn-primary" @click="register()">Đăng ký</button>
+            </div>
+        </div>
+        `,
+        data(){
+            return {
+                lastname: "",
+                firstname: "",
+                phone: "",
+                email: "",
+                password: ""
+            }
+        },
+        methods: {
+            register(){
+                var CREATE_USER = `
+                    mutation createUser($username: String, $password: String, $name: String, email: String){
+                        createUser(data: {
+                            name: $name,
+                            phone: $username
+                            username: $username,
+                            password: $password,
+                            email: $email
+                        }) {
+                            id phone
+                        }
+                    }
+                `
+                graphql(CREATE_USER, {
+                    username: this.phone,
+                    phone: this.phone,
+                    password: Math.round(Math.random()*10000000000).toString(),
+                    name: this.firstname + " " + this.lastname,
+                    email: this.email
+                }).then(a => {
+                    console.log(a);
+                    if(a.data.createUser.id){
+                        // Đăng ký thành công
+                        this.$emit("notify", {
+                            content: "Xác thực qua điện thoại - chờ cuộc gọi đến ...",
+                            type: "INFO"
+                        })
+                        this.$emit('changemode', "OTP");
+                    } else {
+                        // Đăng ký thất bại
+                    }
+                });
+            }
+        }
+    })
+    var app_login = new Vue({
+        el: "#app_login",
+        mixins: [VMLogin],
+        computed: {
+            state(){
+                return this.$store.state.state;
+            }
+        }
+    });
+</script>

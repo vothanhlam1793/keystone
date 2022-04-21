@@ -21,6 +21,9 @@
                 <a class="nav-link" href="/viewpacking">Tra cứu đơn hàng</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="/quatang">Quà tặng</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/info">Liên hệ</a>
             </li>    
         </ul>
@@ -53,7 +56,10 @@
                     </div>
                     <div v-if="mode=='OTP'">
                         <div v-if='counter_ui'>
-                            <p>Chờ: {{counter}} s</p>
+                            <p>Chờ: {{counter}} s / 30s</p>
+                            <div v-if="counter >= 30">
+                                <p>Nếu chưa nhận được OTP bấm <button class="btn btn-info" @click="call_again()">VÀO ĐÂY</button> để hệ thống gọi lại nhé ... </p>
+                            </div>
                         </div>
                         <otp @notify="notify_otp"></otp>
                     </div>
@@ -84,6 +90,16 @@
             color_modal: "primary"
         },
         methods: {
+            call_again(){
+                var that = this;
+                graphql(RECOVERY, {
+                    username: localStorage.getItem("call_back_otp")
+                }).then(a=>{
+                    that.notify.content = "Hệ thống đang gọi lại số: " + localStorage.getItem("call_back_otp");
+                    that.notify.type = "WARNING";
+                    that.counter = 0;
+                })
+            },
             ui_modal: function(mode){
                 switch(mode){
                     case "LOGIN": {

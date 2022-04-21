@@ -1,10 +1,10 @@
 const MongoStore = require('connect-mongo');
 const { MongoClient } = require('mongodb');
 
-var db = new MongoClient("mongodb://node.creta.work:30042/ks5",{
+var db = new MongoClient(process.env.MONGO_URL_SESSION,{
     auth: {
-        "user": "black",
-        "password": "asrkpvg7"
+        "user": process.env.MONGO_USER,
+        "password": process.env.MONGO_PASS,
     },
     authSource: "admin",
     useNewUrlParser: true,

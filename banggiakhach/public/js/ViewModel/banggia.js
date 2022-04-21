@@ -2,7 +2,7 @@ function chuyentiengviet(str) {
     return str.normalize('NFD')
               .replace(/[\u0300-\u036f]/g, '')
               .replace(/đ/g, 'd').replace(/Đ/g, 'D');
-  }
+}
 function VMBanggia(el, mix){
     return new Vue({
         el: el,

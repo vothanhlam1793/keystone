@@ -17,8 +17,9 @@ module.exports = {
     fields: {
         name: {
             type: Text,
-            isRequired: true.valueOf,
-            isUnique: true
+            isRequired: true,
+            isUnique: true,
+            label: "Tên Creta"
         },
         description: {
             type: Wysiwyg
@@ -37,7 +38,25 @@ module.exports = {
             ],
             defaultValue: 'DRAFT'
         },
+        nameRaw: {
+            type: Text,
+            label: "Tên nhà sản xuất"
+        },
+        brand: {
+            type: Text,
+            label: "Hãng sản xuất"
+        },
+        code: {
+            type: Text,
+            label: "Mã hàng Creta"
+        },
         price: {
+            type: Integer
+        },
+        price_1: {
+            type: Integer
+        },
+        price_2: {
             type: Integer
         },
         attributes: {
